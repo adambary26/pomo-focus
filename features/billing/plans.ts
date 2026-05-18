@@ -1,0 +1,66 @@
+export const PLANS = {
+  free: {
+    name: 'Free',
+    slug: 'free',
+    price: { monthly: 0, yearly: 0 },
+    description: 'Perfect for getting started with focus',
+    features: [
+      'Basic Pomodoro Timer',
+      '11 Color Themes',
+      '3 Ambient Sounds',
+      "Today's Statistics",
+      'Local Task List',
+      'Dark Mode',
+    ],
+    limits: {
+      themes: 11,
+      sounds: 3,
+      statsHistory: 'today' as const,
+      cloudSync: false,
+      customSounds: false,
+      presets: 0,
+      dataExport: false,
+      achievements: false,
+    },
+    cta: 'Get Started',
+    popular: false,
+  },
+  premium: {
+    name: 'Premium',
+    slug: 'premium',
+    price: { monthly: 1.5, yearly: 15 },
+    description: 'Unlock your full potential',
+    features: [
+      'Everything in Free',
+      'Cloud Sync Across Devices',
+      '50+ Premium Themes',
+      'Custom Sound Upload',
+      'Advanced Statistics & Heatmap',
+      'Unlimited History',
+      'Timer Presets',
+      'Data Export (CSV/JSON)',
+      'Streaks & Achievements',
+      'Custom Alarm Sounds',
+      'Priority Support',
+    ],
+    limits: {
+      themes: 999,
+      sounds: 999,
+      statsHistory: 'unlimited' as const,
+      cloudSync: true,
+      customSounds: true,
+      presets: 999,
+      dataExport: true,
+      achievements: true,
+    },
+    cta: 'Start Premium',
+    popular: true,
+    stripePriceIds: {
+      monthly: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID || '',
+      yearly: process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID || '',
+    },
+  },
+} as const;
+
+export type PlanSlug = keyof typeof PLANS;
+export type Plan = (typeof PLANS)[PlanSlug];
