@@ -57,6 +57,7 @@ function CircularProgress({ ring, index, total }: { ring: RingConfig; index: num
 }
 
 export function FocusRings() {
+  console.log('FocusRings rendering');
   const { totalPomodoros, totalFocusSeconds, lastActiveDate } = useAchievementsStore();
   const { stats } = useTimerStore();
   const [todayPomodoros, setTodayPomodoros] = useState(0);
