@@ -6,6 +6,7 @@ import { playBeep } from '@/features/audio/audio-engine';
 import { useAchievementsStore, BADGES } from '@/features/achievements/achievements-store';
 import { pushSyncData } from '@/features/sync/sync-engine';
 import { useToastStore } from '@/features/notifications/toast-store';
+import { useRewardsStore } from '@/features/rewards/rewards-store';
 
 interface TimerState {
   phase: TimerPhase;
@@ -129,6 +130,9 @@ export const useTimerStore = create<TimerState>()(
               }
             }
           }
+
+          const { triggerReward } = useRewardsStore.getState();
+          triggerReward(newStats.sessionCount);
 
           pushSyncData('stats', newStats).catch(() => {});
         }

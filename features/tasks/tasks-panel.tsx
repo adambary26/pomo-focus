@@ -15,9 +15,23 @@ export function TasksPanel() {
   };
 
   const toggleTask = (id: string) => {
-    setTasksList((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
-    );
+    setTasksList((prev) => {
+      const task = prev.find((t) => t.id === id);
+      const wasDone = task?.done;
+      const updated = prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t));
+
+      if (task && !wasDone) {
+        const today = new Date().toISOString().split('T')[0];
+        const dailyData = JSON.parse(localStorage.getItem('pomo_daily_tracking') || '{}');
+        if (!dailyData[today]) {
+          dailyData[today] = { pomodoros: 0, focusMinutes: 0, tasks: 0 };
+        }
+        dailyData[today].tasks += 1;
+        localStorage.setItem('pomo_daily_tracking', JSON.stringify(dailyData));
+      }
+
+      return updated;
+    });
   };
 
   const deleteTask = (id: string) => {

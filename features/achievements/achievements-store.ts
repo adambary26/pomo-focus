@@ -63,6 +63,14 @@ export const useAchievementsStore = create<AchievementsState>()(
           newStreak = 1;
         }
 
+        const dailyData = JSON.parse(localStorage.getItem('pomo_daily_tracking') || '{}');
+        if (!dailyData[today]) {
+          dailyData[today] = { pomodoros: 0, focusMinutes: 0, tasks: 0 };
+        }
+        dailyData[today].pomodoros += 1;
+        dailyData[today].focusMinutes += focusSeconds / 60;
+        localStorage.setItem('pomo_daily_tracking', JSON.stringify(dailyData));
+
         set({
           currentStreak: newStreak,
           longestStreak: Math.max(longestStreak, newStreak),

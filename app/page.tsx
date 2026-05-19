@@ -12,6 +12,7 @@ import { TasksPanel } from '@/features/tasks/tasks-panel';
 import { MusicPanel } from '@/features/audio/music-panel';
 import { SettingsModal } from '@/features/settings/settings-modal';
 import { PresetsSelector } from '@/features/presets/presets-selector';
+import { FocusRings } from '@/components/focus-rings';
 import { loadState } from '@/shared/storage';
 
 export default function Home() {
@@ -184,6 +185,7 @@ export default function Home() {
 
       <div className="app">
         <aside className="sidebar">
+          <FocusRings />
           <StatsPanel />
           <PresetsSelector />
           <ThemeStrip />
