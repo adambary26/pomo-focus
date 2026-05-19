@@ -1,7 +1,25 @@
 import { createBrowserClient, createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+const SUPABASE_CONFIGURED =
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('your-project');
+
+const MOCK_SUPABASE = {
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null }),
+    getUser: async () => ({ data: { user: null }, error: null }),
+  },
+  from: () => ({
+    select: () => ({ eq: () => ({ single: async () => ({ data: null, error: null }) }) }),
+    upsert: () => ({ eq: async () => ({ data: null, error: null }) }),
+    update: () => ({ eq: async () => ({ data: null, error: null }) }),
+  }),
+} as any;
+
 export function createBrowserSupabaseClient() {
+  if (!SUPABASE_CONFIGURED) return MOCK_SUPABASE;
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -9,6 +27,8 @@ export function createBrowserSupabaseClient() {
 }
 
 export async function createServerSupabaseClient() {
+  if (!SUPABASE_CONFIGURED) return MOCK_SUPABASE;
+
   const cookieStore = await cookies();
 
   return createServerClient(
