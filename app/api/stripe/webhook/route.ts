@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'getStripe()';
-import { getStripe } from '@/lib/getStripe()';
+import Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe';
 import { createServerSupabaseClient } from '@/lib/supabase';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = request.headers.get('getStripe()-signature');
+  const signature = request.headers.get('stripe-signature');
 
   if (!signature) {
     return NextResponse.json({ error: 'No signature' }, { status: 400 });
@@ -40,9 +40,9 @@ export async function POST(request: Request) {
 
         await supabase.from('subscriptions').upsert({
           user_id: userId,
-          getStripe()_subscription_id: sub.id,
-          getStripe()_customer_id: session.customer as string,
-          getStripe()_price_id: sub.items?.data?.[0]?.price?.id,
+          stripe_subscription_id: sub.id,
+          stripe_customer_id: session.customer as string,
+          stripe_price_id: sub.items?.data?.[0]?.price?.id,
           status: sub.status,
           plan: 'premium',
           current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000) : null,
@@ -60,8 +60,8 @@ export async function POST(request: Request) {
 
         await supabase.from('subscriptions').upsert({
           user_id: userId,
-          getStripe()_subscription_id: sub.id,
-          getStripe()_price_id: sub.items?.data?.[0]?.price?.id,
+          stripe_subscription_id: sub.id,
+          stripe_price_id: sub.items?.data?.[0]?.price?.id,
           status: sub.status,
           plan: sub.status === 'active' || sub.status === 'trialing' ? 'premium' : 'free',
           current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000) : null,
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
             cancel_at_period_end: false,
             updated_at: new Date(),
           })
-          .eq('getStripe()_subscription_id', sub.id);
+          .eq('stripe_subscription_id', sub.id);
 
         break;
       }
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
 
         await supabase.from('subscriptions').upsert({
           user_id: userId,
-          getStripe()_subscription_id: sub.id,
+          stripe_subscription_id: sub.id,
           status: sub.status,
           current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000) : null,
           updated_at: new Date(),
@@ -130,7 +130,7 @@ export async function POST(request: Request) {
             status: 'past_due',
             updated_at: new Date(),
           })
-          .eq('getStripe()_subscription_id', sub.id);
+          .eq('stripe_subscription_id', sub.id);
 
         break;
       }

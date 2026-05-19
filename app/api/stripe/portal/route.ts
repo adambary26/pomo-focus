@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getStripe } from '@/lib/getStripe()';
+import { getStripe } from '@/lib/stripe';
 import { getServerSession, createServerSupabaseClient } from '@/lib/supabase';
 
 export async function POST() {
@@ -13,16 +13,16 @@ export async function POST() {
 
     const { data: user } = await supabase
       .from('users')
-      .select('getStripe()_customer_id')
+      .select('stripe_customer_id')
       .eq('id', session.user.id)
       .single();
 
-    if (!user?.getStripe()_customer_id) {
+    if (!user?.stripe_customer_id) {
       return NextResponse.json({ error: 'No subscription found' }, { status: 404 });
     }
 
     const portalSession = await getStripe().billingPortal.sessions.create({
-      customer: user.getStripe()_customer_id,
+      customer: user.stripe_customer_id,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/billing`,
     });
 

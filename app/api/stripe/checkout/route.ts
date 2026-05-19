@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getStripe } from '@/lib/getStripe()';
+import { getStripe } from '@/lib/stripe';
 import { createServerSupabaseClient, getServerSession } from '@/lib/supabase';
 
 export async function POST(request: Request) {
@@ -19,11 +19,11 @@ export async function POST(request: Request) {
 
     const { data: user } = await supabase
       .from('users')
-      .select('getStripe()_customer_id')
+      .select('stripe_customer_id')
       .eq('id', session.user.id)
       .single();
 
-    let customerId = user?.getStripe()_customer_id;
+    let customerId = user?.stripe_customer_id;
 
     if (!customerId) {
       const customer = await getStripe().customers.create({
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
       await supabase
         .from('users')
-        .update({ getStripe()_customer_id: customerId })
+        .update({ stripe_customer_id: customerId })
         .eq('id', session.user.id);
     }
 
