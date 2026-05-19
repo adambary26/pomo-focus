@@ -1,11 +1,18 @@
 import Stripe from 'stripe';
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-04-22.dahlia',
-  typescript: true,
-});
+let stripeInstance: Stripe | null = null;
+
+export function getStripe(): Stripe {
+  if (!stripeInstance) {
+    stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: '2026-04-22.dahlia',
+      typescript: true,
+    });
+  }
+  return stripeInstance;
+}
 
 export const STRIPE_PRICE_IDS = {
-  premiumMonthly: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID!,
-  premiumYearly: process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID!,
+  premiumMonthly: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID || '',
+  premiumYearly: process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID || '',
 };

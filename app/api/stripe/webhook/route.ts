@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { stripe } from '@/lib/stripe';
+import Stripe from 'getStripe()';
+import { getStripe } from '@/lib/getStripe()';
 import { createServerSupabaseClient } from '@/lib/supabase';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = request.headers.get('stripe-signature');
+  const signature = request.headers.get('getStripe()-signature');
 
   if (!signature) {
     return NextResponse.json({ error: 'No signature' }, { status: 400 });
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
     console.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
 
         if (!userId || !session.subscription) break;
 
-        const subscription = await stripe.subscriptions.retrieve(
+        const subscription = await getStripe().subscriptions.retrieve(
           session.subscription as string
         );
 
@@ -40,9 +40,9 @@ export async function POST(request: Request) {
 
         await supabase.from('subscriptions').upsert({
           user_id: userId,
-          stripe_subscription_id: sub.id,
-          stripe_customer_id: session.customer as string,
-          stripe_price_id: sub.items?.data?.[0]?.price?.id,
+          getStripe()_subscription_id: sub.id,
+          getStripe()_customer_id: session.customer as string,
+          getStripe()_price_id: sub.items?.data?.[0]?.price?.id,
           status: sub.status,
           plan: 'premium',
           current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000) : null,
@@ -60,8 +60,8 @@ export async function POST(request: Request) {
 
         await supabase.from('subscriptions').upsert({
           user_id: userId,
-          stripe_subscription_id: sub.id,
-          stripe_price_id: sub.items?.data?.[0]?.price?.id,
+          getStripe()_subscription_id: sub.id,
+          getStripe()_price_id: sub.items?.data?.[0]?.price?.id,
           status: sub.status,
           plan: sub.status === 'active' || sub.status === 'trialing' ? 'premium' : 'free',
           current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000) : null,
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
             cancel_at_period_end: false,
             updated_at: new Date(),
           })
-          .eq('stripe_subscription_id', sub.id);
+          .eq('getStripe()_subscription_id', sub.id);
 
         break;
       }
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
         const subscriptionId = invoice.subscription;
         if (!subscriptionId) break;
 
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
         const sub = subscription as any;
         const userId = sub.metadata?.userId;
 
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
 
         await supabase.from('subscriptions').upsert({
           user_id: userId,
-          stripe_subscription_id: sub.id,
+          getStripe()_subscription_id: sub.id,
           status: sub.status,
           current_period_end: sub.current_period_end ? new Date(sub.current_period_end * 1000) : null,
           updated_at: new Date(),
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
         const subscriptionId = invoice.subscription;
         if (!subscriptionId) break;
 
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
         const sub = subscription as any;
         const userId = sub.metadata?.userId;
 
@@ -130,7 +130,7 @@ export async function POST(request: Request) {
             status: 'past_due',
             updated_at: new Date(),
           })
-          .eq('stripe_subscription_id', sub.id);
+          .eq('getStripe()_subscription_id', sub.id);
 
         break;
       }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/getStripe()';
 import { createServerSupabaseClient, getServerSession } from '@/lib/supabase';
 
 export async function POST(request: Request) {
@@ -19,14 +19,14 @@ export async function POST(request: Request) {
 
     const { data: user } = await supabase
       .from('users')
-      .select('stripe_customer_id')
+      .select('getStripe()_customer_id')
       .eq('id', session.user.id)
       .single();
 
-    let customerId = user?.stripe_customer_id;
+    let customerId = user?.getStripe()_customer_id;
 
     if (!customerId) {
-      const customer = await stripe.customers.create({
+      const customer = await getStripe().customers.create({
         email: session.user.email,
         metadata: { userId: session.user.id },
       });
@@ -34,11 +34,11 @@ export async function POST(request: Request) {
 
       await supabase
         .from('users')
-        .update({ stripe_customer_id: customerId })
+        .update({ getStripe()_customer_id: customerId })
         .eq('id', session.user.id);
     }
 
-    const checkoutSession = await stripe.checkout.sessions.create({
+    const checkoutSession = await getStripe().checkout.sessions.create({
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
