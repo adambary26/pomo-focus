@@ -57,6 +57,14 @@ function CircularProgress({ ring, index, total }: { ring: RingConfig; index: num
 }
 
 export function FocusRings() {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   console.log('FocusRings rendering');
   const { totalPomodoros, totalFocusSeconds, lastActiveDate } = useAchievementsStore();
   const { stats } = useTimerStore();
