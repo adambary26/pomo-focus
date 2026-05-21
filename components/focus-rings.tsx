@@ -152,9 +152,4 @@ export function FocusRings() {
       </div>
     </div>
   );
-          })}
-        </div>
-      </div>
-    </div>
-  );
 }
