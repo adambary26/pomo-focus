@@ -13,11 +13,13 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then((result) => {
-      if (!result.data.session) {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
         router.push('/forgot-password');
       }
-    });
+    };
+    checkSession();
   }, [supabase.auth, router]);
 
   const handleReset = async (e: React.FormEvent) => {
