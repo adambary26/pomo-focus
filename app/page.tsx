@@ -193,57 +193,55 @@ export default function Home() {
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
-                <button
-                  key={tab.id}
-                  className={`panel-tab ${activeTab === tab.id ? 'active' : ''}`}
-                  onClick={() => setActiveTab(tab.id)}
-                >
+                  <button
+                    key={tab.id}
+                    className={`panel-tab ${activeTab === tab.id ? 'active' : ''}`}
+                    onClick={() => setActiveTab(tab.id)}
+                  >
                   <Icon size={14} />
                   <span>{tab.label}</span>
                 </button>
               );
             })}
           </div>
-          {activeTab && (
-            <div className="panel-content">
-              {activeTab === 'stats' && (
-                <div className="panel-window">
-                  <div className="bento-grid">
-                    <div className="bento-card bento-wide">
-                      <FocusRings />
-                    </div>
-                    <div className="bento-card">
-                      <StatsPanel />
-                    </div>
+          <div className="panel-content" key={activeTab}>
+            {activeTab === 'stats' && (
+              <div className="panel-window">
+                <div className="bento-grid">
+                  <div className="bento-card bento-wide">
+                    <FocusRings />
+                  </div>
+                  <div className="bento-card">
+                    <StatsPanel />
                   </div>
                 </div>
-              )}
-              {activeTab === 'tools' && (
-                <div className="panel-window">
-                  <div className="bento-grid">
-                    <div className="bento-card">
-                      <PresetsSelector />
-                    </div>
-                    <div className="bento-card">
-                      <ThemeStrip />
-                    </div>
-                    <div className="bento-card">
-                      <MusicPanel />
-                    </div>
+              </div>
+            )}
+            {activeTab === 'tools' && (
+              <div className="panel-window">
+                <div className="bento-grid">
+                  <div className="bento-card">
+                    <PresetsSelector />
+                  </div>
+                  <div className="bento-card">
+                    <ThemeStrip />
+                  </div>
+                  <div className="bento-card">
+                    <MusicPanel />
                   </div>
                 </div>
-              )}
-              {activeTab === 'tasks' && (
-                <div className="panel-window">
-                  <div className="bento-grid bento-single">
-                    <div className="bento-card">
-                      <TasksPanel />
-                    </div>
+              </div>
+            )}
+            {activeTab === 'tasks' && (
+              <div className="panel-window">
+                <div className="bento-grid bento-single">
+                  <div className="bento-card">
+                    <TasksPanel />
                   </div>
                 </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
 
         <main className="main">
