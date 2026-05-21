@@ -55,6 +55,7 @@ export function MusicPanel() {
     <div>
       <div className="card-title">Music</div>
       <select
+        id="music-track-select"
         className="skip-select"
         style={{ width: '100%', marginBottom: 10, height: 32, fontSize: 11 }}
         value={selectedTrack}
@@ -75,6 +76,7 @@ export function MusicPanel() {
           <span style={{ marginLeft: 4 }}>{playing ? 'Pause' : 'Play'}</span>
         </button>
         <input
+          id="music-volume"
           type="range"
           className="setting-range"
           min={0}

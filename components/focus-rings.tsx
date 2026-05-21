@@ -74,14 +74,6 @@ export function FocusRings() {
     setTodayTasks(todayData.tasks || 0);
   }, [today, totalPomodoros, totalFocusSeconds, stats]);
 
-  useEffect(() => {
-    const dailyData = JSON.parse(localStorage.getItem('pomo_daily_tracking') || '{}');
-    const todayData = dailyData[today] || { pomodoros: 0, focusMinutes: 0, tasks: 0 };
-    setTodayPomodoros(todayData.pomodoros || 0);
-    setTodayFocusMinutes(todayData.focusMinutes || 0);
-    setTodayTasks(todayData.tasks || 0);
-  }, [today, totalPomodoros, totalFocusSeconds, stats]);
-
   const rings: RingConfig[] = [
     { label: 'Focus Sessions', color: '#ff6b6b', current: todayPomodoros, target: 8, unit: 'sessions' },
     { label: 'Focus Time', color: '#4ecdc4', current: Math.round(todayFocusMinutes), target: 120, unit: 'min' },
@@ -92,10 +84,6 @@ export function FocusRings() {
 
   return (
     <div style={{
-      background: 'var(--surface)',
-      borderRadius: 20,
-      padding: 24,
-      border: '1px solid var(--border)',
       position: 'relative',
       overflow: 'hidden',
     }}>
@@ -108,43 +96,43 @@ export function FocusRings() {
         }} />
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-        <svg width="200" height="200" viewBox="0 0 200 200" style={{ flexShrink: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <svg width="140" height="140" viewBox="0 0 200 200" style={{ flexShrink: 0 }}>
           {rings.map((ring, i) => (
             <CircularProgress key={ring.label} ring={ring} index={i} total={rings.length} />
           ))}
-          <text x="100" y="95" textAnchor="middle" fill="var(--fg)" fontSize="28" fontWeight="800">
+          <text x="100" y="92" textAnchor="middle" fill="var(--fg)" fontSize="24" fontWeight="800">
             {rings.reduce((sum, r) => sum + Math.min(r.current, r.target), 0)}/
             {rings.reduce((sum, r) => sum + r.target, 0)}
           </text>
-          <text x="100" y="115" textAnchor="middle" fill="var(--muted)" fontSize="11" fontWeight="600">
+          <text x="100" y="112" textAnchor="middle" fill="var(--muted)" fontSize="11" fontWeight="600">
             {allComplete ? 'All complete!' : 'Keep going!'}
           </text>
         </svg>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 800, margin: 0 }}>Today's Focus</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 800, margin: 0 }}>Today's Focus</h3>
           {rings.map((ring) => {
             const progress = Math.min(ring.current / ring.target, 1);
             return (
               <div key={ring.label}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <div style={{
-                      width: 10,
-                      height: 10,
+                      width: 8,
+                      height: 8,
                       borderRadius: '50%',
                       background: ring.color,
-                      boxShadow: progress >= 1 ? `0 0 8px ${ring.color}` : 'none',
+                      boxShadow: progress >= 1 ? `0 0 6px ${ring.color}` : 'none',
                     }} />
-                    <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--fg)' }}>{ring.label}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--fg)' }}>{ring.label}</span>
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: progress >= 1 ? ring.color : 'var(--muted)' }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: progress >= 1 ? ring.color : 'var(--muted)' }}>
                     {ring.current}/{ring.target} {ring.unit}
                   </span>
                 </div>
                 <div style={{
-                  height: 4,
+                  height: 3,
                   borderRadius: 2,
                   background: 'var(--bg)',
                   overflow: 'hidden',
@@ -159,6 +147,11 @@ export function FocusRings() {
                 </div>
               </div>
             );
+          })}
+        </div>
+      </div>
+    </div>
+  );
           })}
         </div>
       </div>

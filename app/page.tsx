@@ -188,23 +188,23 @@ export default function Home() {
       </header>
 
       <div className="app">
-        <div className="content-area">
-          <div className="panel-bar">
-            <div className="panel-tabs">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    className={`panel-tab ${activeTab === tab.id ? 'active' : ''}`}
-                    onClick={() => setActiveTab(tab.id)}
-                  >
-                    <Icon size={16} />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+        <div className="panel-bar">
+          <div className="panel-tabs">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  className={`panel-tab ${activeTab === tab.id ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <Icon size={14} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          {activeTab && (
             <div className="panel-content">
               {activeTab === 'stats' && (
                 <div className="panel-window">
@@ -243,15 +243,15 @@ export default function Home() {
                 </div>
               )}
             </div>
-          </div>
-
-          <main className="main">
-            <div className="timer-area">
-              <TimerDisplay />
-              <TimerControls />
-            </div>
-          </main>
+          )}
         </div>
+
+        <main className="main">
+          <div className="timer-area">
+            <TimerDisplay />
+            <TimerControls />
+          </div>
+        </main>
       </div>
 
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />

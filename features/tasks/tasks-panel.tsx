@@ -47,6 +47,7 @@ export function TasksPanel() {
       <div className="card-title">Tasks</div>
       <div className="task-input-wrap">
         <input
+          id="task-input"
           type="text"
           placeholder="Add task..."
           value={input}
