@@ -1,4 +1,5 @@
-import { createBrowserClient, createServerClient, createClient, type CookieOptions } from '@supabase/ssr';
+import { createBrowserClient, createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 const SUPABASE_CONFIGURED =
@@ -71,7 +72,7 @@ export async function getServerUser() {
 
 export function createServiceRoleClient() {
   if (!SUPABASE_CONFIGURED || !process.env.SUPABASE_SERVICE_ROLE_KEY) return MOCK_SUPABASE;
-  return createClient(
+  return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
