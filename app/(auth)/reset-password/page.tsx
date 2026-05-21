@@ -13,8 +13,8 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
+    supabase.auth.getSession().then((result) => {
+      if (!result.data.session) {
         router.push('/forgot-password');
       }
     });
