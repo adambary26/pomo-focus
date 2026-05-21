@@ -1,17 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useToastStore } from './toast-store';
 import { X } from 'lucide-react';
 
 export function ToastContainer() {
   const { toasts, removeToast } = useToastStore();
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
-
-  if (!mounted || toasts.length === 0) return null;
+  if (toasts.length === 0) return null;
 
   return createPortal(
     <div style={{

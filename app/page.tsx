@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Sun, Moon, Settings, User, LogOut, CreditCard, Crown } from 'lucide-react';
 import { useTheme } from '@/features/themes/theme-provider';
 import { useAuth } from '@/features/auth/auth-provider';
@@ -20,13 +20,6 @@ export default function Home() {
   const { user, signOut } = useAuth();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [authMenuOpen, setAuthMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
 
   return (
     <>

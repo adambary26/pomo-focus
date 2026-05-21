@@ -62,23 +62,17 @@ export function FocusRings() {
   const [todayPomodoros, setTodayPomodoros] = useState(0);
   const [todayFocusMinutes, setTodayFocusMinutes] = useState(0);
   const [todayTasks, setTodayTasks] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const dailyData = JSON.parse(localStorage.getItem('pomo_daily_tracking') || '{}');
     const todayData = dailyData[today] || { pomodoros: 0, focusMinutes: 0, tasks: 0 };
     setTodayPomodoros(todayData.pomodoros || 0);
     setTodayFocusMinutes(todayData.focusMinutes || 0);
     setTodayTasks(todayData.tasks || 0);
   }, [today, totalPomodoros, totalFocusSeconds, stats]);
-
-  if (!mounted) return null;
 
   useEffect(() => {
     const dailyData = JSON.parse(localStorage.getItem('pomo_daily_tracking') || '{}');

@@ -15,31 +15,25 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [palette, setPaletteState] = useState('tech');
-  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     const state = loadState();
     setTheme(state.theme);
     setPaletteState(state.palette);
-    setHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (!hydrated) return;
     document.documentElement.dataset.theme = theme;
     saveState({ theme });
-  }, [theme, hydrated]);
+  }, [theme]);
 
   useEffect(() => {
-    if (!hydrated) return;
     document.documentElement.dataset.palette = palette;
     saveState({ palette });
-  }, [palette, hydrated]);
+  }, [palette]);
 
   const toggleTheme = () => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   const setPalette = (id: string) => setPaletteState(id);
-
-  if (!hydrated) return null;
 
   return (
     <ThemeContext.Provider value={{ theme, palette, toggleTheme, setPalette }}>
