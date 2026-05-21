@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/features/auth/auth-provider';
 import { getSupabaseBrowserClient } from '@/features/auth/supabase-client';
-import { CreditCard, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CreditCard, Calendar, CheckCircle, XCircle, Clock, Shield, ArrowUpRight } from 'lucide-react';
 
 function BillingContent() {
   const searchParams = useSearchParams();
@@ -18,25 +18,21 @@ function BillingContent() {
   useEffect(() => {
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
-
-    if (success) setMessage('✅ Payment successful! Your Premium plan is now active.');
-    if (canceled) setMessage('❌ Payment was canceled. You can try again anytime.');
+    if (success) setMessage('Payment successful! Your Premium plan is now active.');
+    if (canceled) setMessage('Payment was canceled. You can try again anytime.');
   }, [searchParams]);
 
   useEffect(() => {
     if (!user) return;
-
     const fetchSubscription = async () => {
       const { data } = await supabase
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
         .single();
-
       setSubscription(data);
       setLoading(false);
     };
-
     fetchSubscription();
   }, [user, supabase]);
 
@@ -55,10 +51,11 @@ function BillingContent() {
 
   if (!user) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
-        <div style={{ textAlign: 'center' }}>
+      <div className="billing-page">
+        <div className="billing-container" style={{ textAlign: 'center', paddingTop: '100px' }}>
+          <Shield size={48} style={{ color: 'var(--muted)', marginBottom: 16 }} />
           <p style={{ color: 'var(--muted)', marginBottom: 16 }}>Please sign in to manage your billing</p>
-          <a href="/login" style={{ color: 'var(--accent)', fontWeight: 700 }}>Sign in →</a>
+          <a href="/login" style={{ color: 'var(--accent)', fontWeight: 700, fontSize: 15 }}>Sign in &rarr;</a>
         </div>
       </div>
     );
@@ -66,8 +63,11 @@ function BillingContent() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
-        <p style={{ color: 'var(--muted)' }}>Loading...</p>
+      <div className="billing-page">
+        <div className="billing-container" style={{ textAlign: 'center', paddingTop: '100px' }}>
+          <div className="spinner" style={{ width: 32, height: 32, margin: '0 auto 12px', color: 'var(--accent)' }} />
+          <p style={{ color: 'var(--muted)' }}>Loading billing info...</p>
+        </div>
       </div>
     );
   }
@@ -78,7 +78,7 @@ function BillingContent() {
     subscription?.current_period_end &&
     new Date(subscription.current_period_end) > new Date();
 
-  const statusConfig: Record<string, { icon: any; color: string; label: string }> = {
+  const statusConfig: Record<string, { icon: typeof CheckCircle; color: string; label: string }> = {
     active: { icon: CheckCircle, color: 'oklch(65% 0.18 145)', label: 'Active' },
     past_due: { icon: Clock, color: 'oklch(65% 0.18 50)', label: 'Past Due' },
     canceled: { icon: XCircle, color: 'oklch(55% 0.15 25)', label: 'Canceled' },
@@ -89,68 +89,38 @@ function BillingContent() {
   const StatusIcon = status.icon;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '40px 24px' }}>
-      <div style={{ maxWidth: 600, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 32, fontWeight: 800, marginBottom: 8 }}>Billing</h1>
-        <p style={{ color: 'var(--muted)', marginBottom: 32 }}>Manage your subscription and payment methods</p>
+    <div className="billing-page">
+      <div className="billing-container">
+        <div className="billing-header">
+          <h1>Billing</h1>
+          <p>Manage your subscription and payment methods</p>
+        </div>
 
         {message && (
-          <div style={{
-            background: message.includes('✅') ? 'oklch(65% 0.18 145 / 0.1)' : 'oklch(55% 0.15 25 / 0.1)',
-            color: message.includes('✅') ? 'oklch(65% 0.18 145)' : 'oklch(55% 0.15 25)',
-            padding: '14px 18px',
-            borderRadius: 14,
-            fontSize: 14,
-            fontWeight: 700,
-            marginBottom: 24,
-          }}>
+          <div className={`billing-alert ${message.includes('successful') ? 'success' : 'error'}`}>
             {message}
           </div>
         )}
 
-        <div style={{
-          background: 'var(--surface)',
-          borderRadius: 20,
-          padding: 28,
-          border: '1px solid var(--border)',
-          marginBottom: 24,
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div className="billing-card">
+          <div className="billing-card-header">
             <div>
-              <h2 style={{ fontSize: 18, fontWeight: 800 }}>
+              <div className="billing-plan-name">
                 {isPremium ? 'Premium Plan' : 'Free Plan'}
-              </h2>
-              <p style={{ color: 'var(--muted)', fontSize: 13 }}>
-                {user?.email}
-              </p>
+              </div>
+              <div className="billing-user-email">{user?.email}</div>
             </div>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              color: status.color,
-              fontWeight: 700,
-              fontSize: 13,
-            }}>
+            <div className="billing-status" style={{ color: status.color }}>
               <StatusIcon size={16} />
               {status.label}
             </div>
           </div>
 
           {subscription?.current_period_end && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '12px 16px',
-              background: 'var(--bg)',
-              borderRadius: 12,
-              fontSize: 13,
-              color: 'var(--muted)',
-            }}>
+            <div className="billing-next-billing">
               <Calendar size={14} />
               Next billing:{' '}
-              <strong style={{ color: 'var(--fg)' }}>
+              <strong>
                 {new Date(subscription.current_period_end).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
@@ -161,40 +131,18 @@ function BillingContent() {
           )}
 
           {subscription?.cancel_at_period_end && (
-            <div style={{
-              marginTop: 12,
-              padding: '10px 14px',
-              background: 'oklch(65% 0.18 50 / 0.1)',
-              borderRadius: 12,
-              fontSize: 12,
-              color: 'oklch(65% 0.18 50)',
-              fontWeight: 700,
-            }}>
-              ⚠️ Your subscription will end on {new Date(subscription.current_period_end).toLocaleDateString()}
+            <div className="billing-cancel-notice">
+              Your subscription will end on {new Date(subscription.current_period_end).toLocaleDateString()}
             </div>
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div className="billing-actions">
           {isPremium ? (
             <button
+              className="billing-btn secondary"
               onClick={openPortal}
               disabled={portalLoading}
-              style={{
-                flex: 1,
-                padding: '14px 24px',
-                borderRadius: 14,
-                border: '1px solid var(--border)',
-                background: 'var(--surface)',
-                color: 'var(--fg)',
-                fontWeight: 800,
-                fontSize: 14,
-                cursor: portalLoading ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-              }}
             >
               <CreditCard size={16} />
               {portalLoading ? 'Loading...' : 'Manage Subscription'}
@@ -202,50 +150,20 @@ function BillingContent() {
           ) : (
             <a
               href="/pricing"
-              style={{
-                flex: 1,
-                padding: '14px 24px',
-                borderRadius: 14,
-                border: 'none',
-                background: 'var(--accent)',
-                color: '#fff',
-                fontWeight: 800,
-                fontSize: 14,
-                textAlign: 'center',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-              }}
+              className="billing-btn primary"
             >
-              <CreditCard size={16} />
+              <ArrowUpRight size={16} />
               Upgrade to Premium
             </a>
           )}
-
-          <button
-            onClick={signOut}
-            style={{
-              padding: '14px 20px',
-              borderRadius: 14,
-              border: '1px solid var(--border)',
-              background: 'transparent',
-              color: 'var(--muted)',
-              fontWeight: 700,
-              fontSize: 14,
-              cursor: 'pointer',
-            }}
-          >
+          <button className="billing-signout" onClick={signOut}>
             Sign Out
           </button>
         </div>
 
-        <p style={{ textAlign: 'center', marginTop: 32, fontSize: 12, color: 'var(--muted)' }}>
+        <p className="billing-help">
           Need help? Contact us at{' '}
-          <a href="mailto:support@pomofocus.app" style={{ color: 'var(--accent)', textDecoration: 'none' }}>
-            support@pomofocus.app
-          </a>
+          <a href="mailto:support@pomofocus.app">support@pomofocus.app</a>
         </p>
       </div>
     </div>
@@ -254,7 +172,14 @@ function BillingContent() {
 
 export default function BillingPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}><p style={{ color: 'var(--muted)' }}>Loading...</p></div>}>
+    <Suspense fallback={
+      <div className="billing-page">
+        <div className="billing-container" style={{ textAlign: 'center', paddingTop: '100px' }}>
+          <div className="spinner" style={{ width: 32, height: 32, margin: '0 auto 12px', color: 'var(--accent)' }} />
+          <p style={{ color: 'var(--muted)' }}>Loading...</p>
+        </div>
+      </div>
+    }>
       <BillingContent />
     </Suspense>
   );

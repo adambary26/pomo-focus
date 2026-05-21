@@ -1,16 +1,25 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getSupabaseBrowserClient } from '@/features/auth/supabase-client';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = getSupabaseBrowserClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const msg = searchParams.get('message');
+    const err = searchParams.get('error');
+    if (msg) setMessage(msg);
+    if (err) setError(err);
+  }, [searchParams]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +40,7 @@ export default function LoginPage() {
     await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/callback`,
       },
     });
   };
@@ -70,6 +79,19 @@ export default function LoginPage() {
             marginBottom: 16,
           }}>
             {error}
+          </div>
+        )}
+
+        {message && (
+          <div style={{
+            background: 'oklch(60% 0.12 145 / 0.1)',
+            color: 'oklch(55% 0.12 145)',
+            padding: '10px 14px',
+            borderRadius: 10,
+            fontSize: 13,
+            marginBottom: 16,
+          }}>
+            {message}
           </div>
         )}
 
@@ -212,6 +234,12 @@ export default function LoginPage() {
           </button>
         </form>
 
+        <p style={{ textAlign: 'center', marginTop: 12, fontSize: 13 }}>
+          <a href="/forgot-password" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'none' }}>
+            Forgot password?
+          </a>
+        </p>
+
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: 'var(--muted)' }}>
           Don't have an account?{' '}
           <a href="/signup" style={{ color: 'var(--accent)', fontWeight: 700, textDecoration: 'none' }}>
@@ -220,5 +248,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}><div style={{ width: 40, height: 40, border: '3px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} /><style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

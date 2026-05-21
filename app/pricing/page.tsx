@@ -1,12 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PLANS } from '@/features/billing/plans';
-import { Check } from 'lucide-react';
+import { Check, Sparkles, Zap, Shield, ArrowRight } from 'lucide-react';
+import { useAuth } from '@/features/auth/auth-provider';
+import { getSupabaseBrowserClient } from '@/features/auth/supabase-client';
 
 export default function PricingPage() {
+  const { user } = useAuth();
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
   const [loading, setLoading] = useState<string | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    const supabase = getSupabaseBrowserClient();
+    supabase
+      .from('subscriptions')
+      .select('status, plan, current_period_end')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data }: { data: any }) => {
+        if (data?.status === 'active' && data?.plan === 'premium' && data?.current_period_end && new Date(data.current_period_end) > new Date()) {
+          setIsPremium(true);
+        }
+      });
+  }, [user]);
 
   const handleSubscribe = async (planSlug: string) => {
     if (planSlug === 'free') {
@@ -38,189 +57,112 @@ export default function PricingPage() {
     }
   };
 
-  return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'var(--bg)',
-      padding: '40px 24px',
-    }}>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h1 style={{ fontSize: 40, fontWeight: 800, marginBottom: 12 }}>
-            Choose your plan
-          </h1>
-          <p style={{ color: 'var(--muted)', fontSize: 16, maxWidth: 500, margin: '0 auto' }}>
-            Start free, upgrade when you're ready. Cancel anytime.
-          </p>
-        </div>
+  const savings = billingInterval === 'yearly' ? '$3' : null;
 
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginBottom: 40,
-          background: 'var(--surface)',
-          borderRadius: 16,
-          padding: 4,
-          width: 'fit-content',
-          margin: '0 auto 40px',
-          border: '1px solid var(--border)',
-        }}>
+  return (
+    <div className="pricing-page">
+      {/* Hero */}
+      <div className="pricing-hero">
+        <div className="pricing-badge">
+          <Sparkles size={14} />
+          <span>Unlock your full potential</span>
+        </div>
+        <h1>Focus smarter, not harder</h1>
+        <p>Start free. Upgrade when you're ready. No limits on your productivity.</p>
+
+        {/* Billing toggle */}
+        <div className="billing-toggle">
           <button
+            className={`toggle-btn ${billingInterval === 'monthly' ? 'active' : ''}`}
             onClick={() => setBillingInterval('monthly')}
-            style={{
-              padding: '10px 24px',
-              borderRadius: 12,
-              border: 'none',
-              background: billingInterval === 'monthly' ? 'var(--accent)' : 'transparent',
-              color: billingInterval === 'monthly' ? '#fff' : 'var(--muted)',
-              fontWeight: 700,
-              fontSize: 14,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
           >
             Monthly
           </button>
           <button
+            className={`toggle-btn ${billingInterval === 'yearly' ? 'active' : ''}`}
             onClick={() => setBillingInterval('yearly')}
-            style={{
-              padding: '10px 24px',
-              borderRadius: 12,
-              border: 'none',
-              background: billingInterval === 'yearly' ? 'var(--accent)' : 'transparent',
-              color: billingInterval === 'yearly' ? '#fff' : 'var(--muted)',
-              fontWeight: 700,
-              fontSize: 14,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              position: 'relative',
-            }}
           >
             Yearly
-            {billingInterval === 'yearly' && (
-              <span style={{
-                position: 'absolute',
-                top: -8,
-                right: -8,
-                background: 'oklch(70% 0.18 160)',
-                color: '#fff',
-                fontSize: 10,
-                fontWeight: 800,
-                padding: '2px 8px',
-                borderRadius: 999,
-              }}>
-                -17%
-              </span>
-            )}
+            <span className="save-badge">Save {savings}</span>
           </button>
         </div>
+      </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 24,
-          maxWidth: 700,
-          margin: '0 auto',
-        }}>
-          {Object.entries(PLANS).map(([slug, plan]) => (
+      {/* Plans */}
+      <div className="pricing-grid">
+        {Object.entries(PLANS).map(([slug, plan]) => {
+          const price = billingInterval === 'monthly' ? plan.price.monthly : plan.price.yearly;
+          const perMonth = billingInterval === 'yearly' ? (plan.price.yearly / 12).toFixed(2) : plan.price.monthly.toFixed(2);
+
+          return (
             <div
               key={slug}
-              style={{
-                background: 'var(--surface)',
-                borderRadius: 20,
-                padding: 32,
-                border: plan.popular
-                  ? '2px solid var(--accent)'
-                  : '1px solid var(--border)',
-                position: 'relative',
-                boxShadow: plan.popular
-                  ? '0 8px 32px oklch(from var(--accent) l c h / 0.15)'
-                  : 'none',
-              }}
+              className={`pricing-card ${plan.popular ? 'popular' : ''}`}
             >
               {plan.popular && (
-                <div style={{
-                  position: 'absolute',
-                  top: -12,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  background: 'var(--accent)',
-                  color: '#fff',
-                  fontSize: 11,
-                  fontWeight: 800,
-                  padding: '4px 16px',
-                  borderRadius: 999,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}>
-                  Most Popular
+                <div className="popular-badge">
+                  <Zap size={12} />
+                  <span>Most Popular</span>
                 </div>
               )}
 
-              <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{plan.name}</h2>
-              <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 20 }}>{plan.description}</p>
-
-              <div style={{ marginBottom: 24 }}>
-                <span style={{ fontSize: 40, fontWeight: 800 }}>
-                  ${billingInterval === 'monthly' ? plan.price.monthly : plan.price.yearly}
-                </span>
-                <span style={{ color: 'var(--muted)', fontSize: 14 }}>
-                  /{billingInterval === 'monthly' ? 'month' : 'year'}
-                </span>
+              <div className="card-header">
+                <h2>{plan.name}</h2>
+                <p>{plan.description}</p>
               </div>
 
-              <ul style={{ listStyle: 'none', padding: 0, marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div className="price-block">
+                <div className="price-main">
+                  <span className="currency">$</span>
+                  <span className="amount">{price}</span>
+                </div>
+                {price > 0 && (
+                  <div className="price-sub">
+                    <span>${perMonth}/mo</span>
+                    {billingInterval === 'yearly' && <span className="billing-note">billed yearly</span>}
+                  </div>
+                )}
+              </div>
+
+              <ul className="feature-list">
                 {plan.features.map((feature) => (
-                  <li key={feature} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 13 }}>
-                    <Check size={16} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }} />
+                  <li key={feature}>
+                    <Check size={14} />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
 
               <button
+                className={`cta-btn ${plan.popular ? 'primary' : 'secondary'}`}
                 onClick={() => handleSubscribe(slug)}
-                disabled={loading === slug}
-                style={{
-                  width: '100%',
-                  padding: '14px 24px',
-                  borderRadius: 14,
-                  border: plan.popular ? 'none' : '1px solid var(--border)',
-                  background: plan.popular ? 'var(--accent)' : 'transparent',
-                  color: plan.popular ? '#fff' : 'var(--fg)',
-                  fontWeight: 800,
-                  fontSize: 15,
-                  cursor: loading === slug ? 'not-allowed' : 'pointer',
-                  opacity: loading === slug ? 0.7 : 1,
-                  transition: 'all 0.2s',
-                }}
+                disabled={loading === slug || (isPremium && plan.slug === 'premium')}
               >
-                {loading === slug ? 'Processing...' : plan.cta}
+                {loading === slug ? (
+                  <span className="spinner" />
+                ) : isPremium && plan.slug === 'premium' ? (
+                  'Already Active'
+                ) : (
+                  <>
+                    {plan.cta}
+                    {plan.popular && <ArrowRight size={16} />}
+                  </>
+                )}
               </button>
             </div>
-          ))}
-        </div>
+          );
+        })}
+      </div>
 
-        <div style={{
-          textAlign: 'center',
-          marginTop: 40,
-          padding: 20,
-          background: 'var(--surface)',
-          borderRadius: 16,
-          border: '1px solid var(--border)',
-          maxWidth: 500,
-          margin: '40px auto 0',
-        }}>
-          <p style={{ fontSize: 13, color: 'var(--muted)' }}>
-            🔒 14-day money-back guarantee. Cancel anytime. No questions asked.
-          </p>
-          <a
-            href="/policy/refund"
-            style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 700, textDecoration: 'none' }}
-          >
-            Read refund policy →
-          </a>
+      {/* Trust bar */}
+      <div className="trust-bar">
+        <div className="trust-item">
+          <Shield size={16} />
+          <span>14-day money-back guarantee</span>
         </div>
+        <a href="/policy/refund" className="trust-link">
+          Read refund policy
+        </a>
       </div>
     </div>
   );

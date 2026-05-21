@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sun, Moon, Settings, User, LogOut, CreditCard, Crown, BarChart3, Zap, CheckSquare } from 'lucide-react';
 import { useTheme } from '@/features/themes/theme-provider';
 import { useAuth } from '@/features/auth/auth-provider';
@@ -22,6 +22,18 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [authMenuOpen, setAuthMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<SidebarTab>('stats');
+  const authMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!authMenuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (authMenuRef.current && !authMenuRef.current.contains(e.target as Node)) {
+        setAuthMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [authMenuOpen]);
 
   const tabs: { id: SidebarTab; label: string; icon: typeof BarChart3 }[] = [
     { id: 'stats', label: 'Stats', icon: BarChart3 },
@@ -83,7 +95,7 @@ export default function Home() {
             <Settings size={16} />
           </button>
           {user ? (
-            <div style={{ position: 'relative' }}>
+            <div ref={authMenuRef} style={{ position: 'relative' }}>
               <button
                 className="icon-btn"
                 onClick={() => setAuthMenuOpen(!authMenuOpen)}
@@ -111,6 +123,28 @@ export default function Home() {
                   <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', marginBottom: 4 }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--fg)' }}>{user.email}</p>
                   </div>
+                  <button
+                    onClick={() => { setSettingsOpen(true); setAuthMenuOpen(false); }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: 'var(--fg)',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      width: '100%',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  >
+                    <Settings size={14} />
+                    Settings
+                  </button>
                   <a
                     href="/billing"
                     style={{
