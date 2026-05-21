@@ -13,7 +13,7 @@ export function StatsPanel() {
   const progressPercent = (progress / settings.interval) * 100;
 
   return (
-    <div className="card">
+    <div>
       <div className="card-title">Today</div>
       <div className="stat-row">
         <span className="stat-label">Pomodoros</span>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sun, Moon, Settings, User, LogOut, CreditCard, Crown, BarChart3, Music, CheckSquare, Palette, Zap } from 'lucide-react';
+import { Sun, Moon, Settings, User, LogOut, CreditCard, Crown, BarChart3, Zap, CheckSquare } from 'lucide-react';
 import { useTheme } from '@/features/themes/theme-provider';
 import { useAuth } from '@/features/auth/auth-provider';
 import { ThemeStrip } from '@/features/themes/theme-strip';
@@ -13,7 +13,6 @@ import { MusicPanel } from '@/features/audio/music-panel';
 import { SettingsModal } from '@/features/settings/settings-modal';
 import { PresetsSelector } from '@/features/presets/presets-selector';
 import { FocusRings } from '@/components/focus-rings';
-import { loadState } from '@/shared/storage';
 
 type SidebarTab = 'stats' | 'tools' | 'tasks';
 
@@ -23,7 +22,6 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [authMenuOpen, setAuthMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<SidebarTab>('stats');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const tabs: { id: SidebarTab; label: string; icon: typeof BarChart3 }[] = [
     { id: 'stats', label: 'Stats', icon: BarChart3 },
@@ -190,59 +188,64 @@ export default function Home() {
       </header>
 
       <div className="app">
-        <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
-          <div className="sidebar-tabs">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  className={`sidebar-tab ${activeTab === tab.id ? 'active' : ''}`}
-                  onClick={() => setActiveTab(tab.id)}
-                  title={tab.label}
-                >
-                  <Icon size={18} />
-                  {!sidebarCollapsed && <span>{tab.label}</span>}
-                </button>
-              );
-            })}
-            <button
-              className="sidebar-tab collapse-btn"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            >
-              {sidebarCollapsed ? <span style={{ fontSize: 14 }}>›</span> : <span style={{ fontSize: 14 }}>‹</span>}
-            </button>
+        <div className="content-area">
+          <div className="panel-bar">
+            <div className="panel-tabs">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    className={`panel-tab ${activeTab === tab.id ? 'active' : ''}`}
+                    onClick={() => setActiveTab(tab.id)}
+                  >
+                    <Icon size={16} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="panel-content">
+              {activeTab === 'stats' && (
+                <div className="bento-grid">
+                  <div className="bento-card bento-wide">
+                    <FocusRings />
+                  </div>
+                  <div className="bento-card">
+                    <StatsPanel />
+                  </div>
+                </div>
+              )}
+              {activeTab === 'tools' && (
+                <div className="bento-grid">
+                  <div className="bento-card">
+                    <PresetsSelector />
+                  </div>
+                  <div className="bento-card">
+                    <ThemeStrip />
+                  </div>
+                  <div className="bento-card">
+                    <MusicPanel />
+                  </div>
+                </div>
+              )}
+              {activeTab === 'tasks' && (
+                <div className="bento-grid bento-single">
+                  <div className="bento-card">
+                    <TasksPanel />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="sidebar-content">
-            {activeTab === 'stats' && (
-              <div className="tab-panel">
-                <FocusRings />
-                <StatsPanel />
-              </div>
-            )}
-            {activeTab === 'tools' && (
-              <div className="tab-panel">
-                <PresetsSelector />
-                <ThemeStrip />
-                <MusicPanel />
-              </div>
-            )}
-            {activeTab === 'tasks' && (
-              <div className="tab-panel">
-                <TasksPanel />
-              </div>
-            )}
-          </div>
-        </aside>
-
-        <main className="main">
-          <div className="timer-area">
-            <TimerDisplay />
-            <TimerControls />
-          </div>
-        </main>
+          <main className="main">
+            <div className="timer-area">
+              <TimerDisplay />
+              <TimerControls />
+            </div>
+          </main>
+        </div>
       </div>
 
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />

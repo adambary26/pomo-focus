@@ -43,7 +43,7 @@ export function TasksPanel() {
   };
 
   return (
-    <div className="card" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       <div className="card-title">Tasks</div>
       <div className="task-input-wrap">
         <input

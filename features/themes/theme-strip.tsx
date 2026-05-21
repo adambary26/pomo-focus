@@ -7,8 +7,8 @@ export function ThemeStrip() {
   const { palette, setPalette } = useTheme();
 
   return (
-    <div className="card" style={{ padding: '12px 16px' }}>
-      <div className="card-title" style={{ marginBottom: 8 }}>Themes</div>
+    <div>
+      <div className="card-title">Themes</div>
       <div className="theme-strip">
         {PALETTES.map((p) => (
           <button

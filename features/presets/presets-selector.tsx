@@ -24,8 +24,8 @@ export function PresetsSelector() {
   );
 
   return (
-    <div className="card" style={{ padding: '12px 16px', position: 'relative' }} ref={ref}>
-      <div className="card-title" style={{ marginBottom: 8 }}>Presets</div>
+    <div style={{ position: 'relative' }} ref={ref}>
+      <div className="card-title">Presets</div>
       <button
         onClick={() => setOpen(!open)}
         style={{
@@ -52,8 +52,8 @@ export function PresetsSelector() {
         <div style={{
           position: 'absolute',
           top: 'calc(100% + 4px)',
-          left: 16,
-          right: 16,
+          left: 0,
+          right: 0,
           background: 'var(--surface)',
           border: '1px solid var(--border)',
           borderRadius: 14,

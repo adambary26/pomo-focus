@@ -52,8 +52,8 @@ export function MusicPanel() {
   };
 
   return (
-    <div className="card" style={{ padding: '12px 16px' }}>
-      <div className="card-title" style={{ marginBottom: 8 }}>Music</div>
+    <div>
+      <div className="card-title">Music</div>
       <select
         className="skip-select"
         style={{ width: '100%', marginBottom: 10, height: 32, fontSize: 11 }}
