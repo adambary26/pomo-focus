@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sun, Moon, Settings, User, LogOut, CreditCard, Crown } from 'lucide-react';
+import { Sun, Moon, Settings, User, LogOut, CreditCard, Crown, BarChart3, Music, CheckSquare, Palette, Zap } from 'lucide-react';
 import { useTheme } from '@/features/themes/theme-provider';
 import { useAuth } from '@/features/auth/auth-provider';
 import { ThemeStrip } from '@/features/themes/theme-strip';
@@ -15,11 +15,21 @@ import { PresetsSelector } from '@/features/presets/presets-selector';
 import { FocusRings } from '@/components/focus-rings';
 import { loadState } from '@/shared/storage';
 
+type SidebarTab = 'stats' | 'tools' | 'tasks';
+
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [authMenuOpen, setAuthMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<SidebarTab>('stats');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const tabs: { id: SidebarTab; label: string; icon: typeof BarChart3 }[] = [
+    { id: 'stats', label: 'Stats', icon: BarChart3 },
+    { id: 'tools', label: 'Tools', icon: Zap },
+    { id: 'tasks', label: 'Tasks', icon: CheckSquare },
+  ];
 
   return (
     <>
@@ -61,8 +71,11 @@ export default function Home() {
       </div>
 
       <header>
-        <div className="logo">
-          <img src="/candle.png" alt="Candle Logo" />
+        <div className="header-left">
+          <div className="logo">
+            <img src="/candle.png" alt="Candle Logo" />
+            <span className="logo-text">Pomo</span>
+          </div>
         </div>
         <div className="header-actions" style={{ position: 'relative' }}>
           <button className="icon-btn" onClick={toggleTheme} title="Toggle dark mode">
@@ -177,13 +190,51 @@ export default function Home() {
       </header>
 
       <div className="app">
-        <aside className="sidebar">
-          <FocusRings />
-          <StatsPanel />
-          <PresetsSelector />
-          <ThemeStrip />
-          <MusicPanel />
-          <TasksPanel />
+        <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+          <div className="sidebar-tabs">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  className={`sidebar-tab ${activeTab === tab.id ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  title={tab.label}
+                >
+                  <Icon size={18} />
+                  {!sidebarCollapsed && <span>{tab.label}</span>}
+                </button>
+              );
+            })}
+            <button
+              className="sidebar-tab collapse-btn"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {sidebarCollapsed ? <span style={{ fontSize: 14 }}>›</span> : <span style={{ fontSize: 14 }}>‹</span>}
+            </button>
+          </div>
+
+          <div className="sidebar-content">
+            {activeTab === 'stats' && (
+              <div className="tab-panel">
+                <FocusRings />
+                <StatsPanel />
+              </div>
+            )}
+            {activeTab === 'tools' && (
+              <div className="tab-panel">
+                <PresetsSelector />
+                <ThemeStrip />
+                <MusicPanel />
+              </div>
+            )}
+            {activeTab === 'tasks' && (
+              <div className="tab-panel">
+                <TasksPanel />
+              </div>
+            )}
+          </div>
         </aside>
 
         <main className="main">
