@@ -207,32 +207,38 @@ export default function Home() {
             </div>
             <div className="panel-content">
               {activeTab === 'stats' && (
-                <div className="bento-grid">
-                  <div className="bento-card bento-wide">
-                    <FocusRings />
-                  </div>
-                  <div className="bento-card">
-                    <StatsPanel />
+                <div className="panel-window">
+                  <div className="bento-grid">
+                    <div className="bento-card bento-wide">
+                      <FocusRings />
+                    </div>
+                    <div className="bento-card">
+                      <StatsPanel />
+                    </div>
                   </div>
                 </div>
               )}
               {activeTab === 'tools' && (
-                <div className="bento-grid">
-                  <div className="bento-card">
-                    <PresetsSelector />
-                  </div>
-                  <div className="bento-card">
-                    <ThemeStrip />
-                  </div>
-                  <div className="bento-card">
-                    <MusicPanel />
+                <div className="panel-window">
+                  <div className="bento-grid">
+                    <div className="bento-card">
+                      <PresetsSelector />
+                    </div>
+                    <div className="bento-card">
+                      <ThemeStrip />
+                    </div>
+                    <div className="bento-card">
+                      <MusicPanel />
+                    </div>
                   </div>
                 </div>
               )}
               {activeTab === 'tasks' && (
-                <div className="bento-grid bento-single">
-                  <div className="bento-card">
-                    <TasksPanel />
+                <div className="panel-window">
+                  <div className="bento-grid bento-single">
+                    <div className="bento-card">
+                      <TasksPanel />
+                    </div>
                   </div>
                 </div>
               )}
