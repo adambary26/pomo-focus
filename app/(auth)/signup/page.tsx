@@ -35,12 +35,19 @@ export default function SignupPage() {
   };
 
   const handleOAuthSignup = async (provider: 'google' | 'github' | 'facebook') => {
-    await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/callback`,
-      },
-    });
+    try {
+      const result = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/callback`,
+        },
+      });
+      if (result?.error) {
+        setError(result.error.message);
+      }
+    } catch (err: any) {
+      setError(err?.message || 'OAuth sign-in failed');
+    }
   };
 
   if (success) {

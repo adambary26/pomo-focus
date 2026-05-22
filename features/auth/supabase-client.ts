@@ -14,6 +14,16 @@ export function getSupabaseBrowserClient() {
         getSession: async () => ({ data: { session: null }, error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
         signOut: async () => {},
+        signInWithOAuth: async () => {
+          throw new Error(
+            'Supabase not configured. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in Vercel env vars.'
+          );
+        },
+        signInWithPassword: async () => ({
+          error: new Error(
+            'Supabase not configured. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in Vercel env vars.'
+          ),
+        }),
       },
     } as any;
   }
